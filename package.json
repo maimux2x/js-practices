@@ -1,0 +1,23 @@
+{
+  "name": "js-practices",
+  "version": "1.0.0",
+  "description": "フィヨルドブートキャンプのJSプラクティスの提出物をまとめるリポジトリです。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maimux2x/js-practices.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maimux2x/js-practices/issues"
+  },
+  "homepage": "https://github.com/maimux2x/js-practices#readme",
+  "devDependencies": {
+    "eslint": "^8.25.0"
+  }
+}

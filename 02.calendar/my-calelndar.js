@@ -40,7 +40,7 @@ let newDt = dt;
 while (newDt <= endDt) {
   process.stdout.write(`${String(newDt.day).padStart(2, " ")} `);
 
-  if (newDt.weekdayShort == "土") {
+  if (newDt.weekdayShort === "土") {
     process.stdout.write("\n");
   }
 

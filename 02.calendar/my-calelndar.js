@@ -14,37 +14,36 @@ const options = minimist(process.argv.slice(2), {
 const year = options.y;
 const month = options.m;
 
-const dt = DateTime.fromObject({
+const date = DateTime.fromObject({
   year: year,
   month: month,
   day: 1,
 });
 
-if (dt.month < 10) {
-  console.log(`      ${dt.month}月 ${dt.year}`);
+if (date.month < 10) {
+  console.log(`      ${date.month}月 ${date.year}`);
 } else {
-  console.log(`     ${dt.month}月 ${dt.year}`);
+  console.log(`     ${date.month}月 ${date.year}`);
 }
 
 console.log("日 月 火 水 木 金 土");
-const endDt = dt.endOf("month");
+const enddate = date.endOf("month");
 
-if (dt.weekday < 7) {
-  const RawSpace = " ";
-  const MakingSpace = RawSpace.repeat(3 * dt.weekday);
+if (date.weekday < 7) {
+  const space = " ".repeat(3 * date.weekday);
 
-  process.stdout.write(MakingSpace);
+  process.stdout.write(space);
 }
 
-let newDt = dt;
-while (newDt <= endDt) {
-  process.stdout.write(`${String(newDt.day).padStart(2, " ")} `);
+let newdate = date;
+while (newdate <= enddate) {
+  process.stdout.write(`${String(newdate.day).padStart(2, " ")} `);
 
-  if (newDt.weekdayShort === "土") {
+  if (newdate.weekday === 6) {
     process.stdout.write("\n");
   }
 
-  newDt = newDt.plus({ day: 1 });
+  newdate = newdate.plus({ day: 1 });
 }
 
 console.log("\n");

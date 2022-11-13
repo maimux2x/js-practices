@@ -1,17 +1,12 @@
-async function main() {
-  try {
-    const result = await fetch("https://bootcamp.fjord.jp/", {
-      method: "GET",
-    })
-      .then((response) => {
-        return response.text();
-      })
-      .then(function (data) {
-        const parser = new DOMParser();
-        return parser.parseFromString(data, "text/html");
-      });
-    console.log(result);
-  } catch (error) {
-    console.error(`エラーが発生しました (${error})`);
+"use strict";
+
+(async function () {
+  const response = await fetch("https://bootcamp.fjord.jp/", {
+    method: "GET",
+  });
+  if (!response.ok) {
+    return;
   }
-}
+  const text = await response.text();
+  console.log(text.replace(/>/g, ">\n"));
+})();

@@ -3,13 +3,14 @@
 import { MemosApp } from "./memo_app.js";
 
 const option = process.argv.slice(2);
+const memo = new MemosApp();
 
 if (option[0] === "-l") {
-  MemosApp.listMemo();
+  memo.listMemo();
 } else if (option[0] === "-r") {
-  MemosApp.referenceMemo();
+  memo.referMemo();
 } else if (option[0] === "-d") {
-  MemosApp.deleteMemo();
+  memo.deleteMemo();
 } else if (option.length === 0) {
-  new MemosApp();
+  memo.addMemo();
 }

@@ -8,12 +8,17 @@ const path = "memos.json";
 
 export class MemosApp {
   constructor() {
+    this.baseData = fs.existsSync(path)
+      ? JSON.parse(fs.readFileSync(path, "utf-8"))
+      : { memos: [] };
+  }
+
+  addMemo() {
     const rl = readline.createInterface({ input, output });
 
     const lines = [];
     rl.on("line", (line) => {
-      //改行ごとに"line"イベントが発火される
-      lines.push(line); //ここで、lines配列に、標準入力から渡されたデータを入れる
+      lines.push(line);
     });
 
     const params = {};
@@ -31,33 +36,26 @@ export class MemosApp {
       const uuid = uuidv4();
 
       params.uuid = uuid;
-      this.memo = params;
-      this.addMemo();
+
+      const newMemo = Object.values(params);
+      const newMemoElement = newMemo[0];
+      if (newMemoElement[0] === "") {
+        console.log("メモの1行目を入力してください。");
+        return;
+      }
+      this.baseData.memos.push(params);
+      const json = JSON.stringify(this.baseData);
+
+      fs.writeFile(path, json, function (err) {
+        if (err) {
+          throw err;
+        }
+        console.log("メモを保存しました。");
+      });
     })();
   }
 
-  addMemo() {
-    const baseData = fs.existsSync(path)
-      ? JSON.parse(fs.readFileSync(path, "utf-8"))
-      : { memos: [] };
-    const newMemo = Object.values(this.memo);
-    const newMemoElement = newMemo[0];
-    if (newMemoElement[0] === "") {
-      console.log("メモの1行目を入力してください。");
-      return;
-    }
-    baseData.memos.push(this.memo);
-    const json = JSON.stringify(baseData);
-
-    fs.writeFile(path, json, function (err) {
-      if (err) {
-        throw err;
-      }
-      console.log("メモを保存しました。");
-    });
-  }
-
-  static listMemo() {
+  listMemo() {
     const memosData = fs.readFileSync(path, "utf-8");
     const base = JSON.parse(memosData);
     const memos = base.memos;
@@ -66,7 +64,7 @@ export class MemosApp {
     });
   }
 
-  static referenceMemo() {
+  referMemo() {
     const memosData = fs.readFileSync(path, "utf-8");
     const base = JSON.parse(memosData);
     const memos = base.memos;
@@ -98,7 +96,7 @@ export class MemosApp {
     })();
   }
 
-  static deleteMemo() {
+  deleteMemo() {
     const memosData = fs.readFileSync(path, "utf-8");
     const base = JSON.parse(memosData);
     const memos = base.memos;

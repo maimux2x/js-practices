@@ -6,11 +6,11 @@ const option = process.argv.slice(2);
 const memo = new MemosApp();
 
 if (option[0] === "-l") {
-  memo.listMemo();
+  memo.list();
 } else if (option[0] === "-r") {
-  memo.referMemo();
+  memo.read();
 } else if (option[0] === "-d") {
-  memo.deleteMemo();
+  memo.delete();
 } else if (option.length === 0) {
-  memo.addMemo();
+  memo.add();
 }

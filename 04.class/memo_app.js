@@ -3,17 +3,20 @@ import * as fs from "node:fs";
 import { stdin as input, stdout as output } from "node:process";
 import Enquirer from "enquirer";
 import { v4 as uuidv4 } from "uuid";
-
-const path = "memos.json";
+import { path, createFile } from "./base_file.js";
 
 export class MemosApp {
   constructor() {
-    this.baseData = fs.existsSync(path)
-      ? JSON.parse(fs.readFileSync(path, "utf-8"))
-      : { memos: [] };
+    if (!fs.existsSync(path)) {
+      createFile();
+      this.baseData = JSON.parse(fs.readFileSync(path, "utf-8"));
+    } else {
+      this.baseData = JSON.parse(fs.readFileSync(path, "utf-8"));
+    }
+    this.memos = this.baseData.memos;
   }
 
-  addMemo() {
+  add() {
     const rl = readline.createInterface({ input, output });
 
     const lines = [];
@@ -43,7 +46,7 @@ export class MemosApp {
         console.log("メモの1行目を入力してください。");
         return;
       }
-      this.baseData.memos.push(params);
+      this.memos.push(params);
       const json = JSON.stringify(this.baseData);
 
       fs.writeFile(path, json, function (err) {
@@ -55,22 +58,16 @@ export class MemosApp {
     })();
   }
 
-  listMemo() {
-    const memosData = fs.readFileSync(path, "utf-8");
-    const base = JSON.parse(memosData);
-    const memos = base.memos;
-    memos.forEach((element) => {
+  list() {
+    this.memos.forEach((element) => {
       console.log(element.memo[0]);
     });
   }
 
-  referMemo() {
-    const memosData = fs.readFileSync(path, "utf-8");
-    const base = JSON.parse(memosData);
-    const memos = base.memos;
+  read() {
     const choices = [];
 
-    memos.forEach((element) => {
+    this.memos.forEach((element) => {
       const choice = {};
       choice.name = element.memo[0];
       choice.value = element.memo;
@@ -96,16 +93,13 @@ export class MemosApp {
     })();
   }
 
-  deleteMemo() {
-    const memosData = fs.readFileSync(path, "utf-8");
-    const base = JSON.parse(memosData);
-    const memos = base.memos;
+  delete() {
     const choices = [];
 
-    memos.forEach((element, index) => {
+    this.memos.forEach((element, index) => {
       const choice = {};
       choice.name = element.memo[0];
-      choice.value = memos[index].uuid;
+      choice.value = this.memos[index].uuid;
       choices.push(choice);
     });
 
@@ -122,12 +116,12 @@ export class MemosApp {
       const answer = await Enquirer.prompt(question);
       const answerUuid = Object.values(answer.result);
 
-      memos.forEach((element, index) => {
+      this.memos.forEach((element, index) => {
         if (element.uuid === answerUuid[0]) {
-          memos.splice(index, 1);
+          this.memos.splice(index, 1);
         }
       });
-      const json = JSON.stringify(base);
+      const json = JSON.stringify(this.baseData);
 
       fs.writeFile(path, json, function (err) {
         if (err) {

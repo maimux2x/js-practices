@@ -1,78 +1,65 @@
-import * as readline from "node:readline/promises";
 import * as fs from "node:fs";
-import { stdin as input, stdout as output } from "node:process";
 import Enquirer from "enquirer";
 import { v4 as uuidv4 } from "uuid";
-import { path, createFile } from "./base_file.js";
+
+const path = "memos.json";
 
 export class MemosApp {
   constructor() {
     if (!fs.existsSync(path)) {
-      createFile();
-      this.baseData = JSON.parse(fs.readFileSync(path, "utf-8"));
-    } else {
-      this.baseData = JSON.parse(fs.readFileSync(path, "utf-8"));
+      this.createFile();
     }
-    this.memos = this.baseData.memos;
+    this.baseData = JSON.parse(fs.readFileSync(path, "utf-8"));
+  }
+
+  createFile() {
+    const rawData = {};
+    const json = JSON.stringify(rawData);
+
+    fs.writeFileSync(path, json, function (err) {
+      if (err) {
+        throw err;
+      }
+    });
   }
 
   add() {
-    const rl = readline.createInterface({ input, output });
+    const uuid = uuidv4();
+    const input = fs.readFileSync("/dev/stdin", "utf-8");
+    const memo = input.split("\n");
+    memo.pop();
 
-    const lines = [];
-    rl.on("line", (line) => {
-      lines.push(line);
-    });
+    if (memo[0] === "") {
+      console.log("メモの1行目を入力してください。");
+      return;
+    }
 
-    const params = {};
-    const memo = function (params, lines) {
-      return new Promise((resolve) => {
-        rl.on("close", () => {
-          params.memo = lines;
-          resolve(params);
-        });
-      });
-    };
+    this.baseData[uuid] = memo;
 
-    (async () => {
-      await memo(params, lines);
-      const uuid = uuidv4();
-
-      params.uuid = uuid;
-
-      const newMemo = Object.values(params);
-      const newMemoElement = newMemo[0];
-      if (newMemoElement[0] === "") {
-        console.log("メモの1行目を入力してください。");
-        return;
+    const json = JSON.stringify(this.baseData);
+    fs.writeFile(path, json, function (err) {
+      if (err) {
+        throw err;
       }
-      this.memos.push(params);
-      const json = JSON.stringify(this.baseData);
-
-      fs.writeFile(path, json, function (err) {
-        if (err) {
-          throw err;
-        }
-        console.log("メモを保存しました。");
-      });
-    })();
+    });
+    console.log("メモを保存しました。");
   }
 
   list() {
-    this.memos.forEach((element) => {
-      console.log(element.memo[0]);
-    });
+    for (const property in this.baseData) {
+      console.log(this.baseData[property][0]);
+    }
   }
 
   read() {
     const choices = [];
 
-    this.memos.forEach((element) => {
+    for (const property in this.baseData) {
       const choice = {};
-      choice.name = element.memo[0];
-      choice.value = element.memo;
+      choice.name = this.baseData[property][0];
+      choice.value = this.baseData[property];
       choices.push(choice);
-    });
+    }
 
     (async () => {
       const question = {
@@ -96,12 +83,12 @@ export class MemosApp {
   delete() {
     const choices = [];
 
-    this.memos.forEach((element, index) => {
+    for (const property in this.baseData) {
       const choice = {};
-      choice.name = element.memo[0];
-      choice.value = this.memos[index].uuid;
+      choice.name = this.baseData[property][0];
+      choice.value = property;
       choices.push(choice);
-    });
+    }
 
     (async () => {
       const question = {
@@ -116,11 +103,11 @@ export class MemosApp {
       const answer = await Enquirer.prompt(question);
       const answerUuid = Object.values(answer.result);
 
-      this.memos.forEach((element, index) => {
-        if (element.uuid === answerUuid[0]) {
-          this.memos.splice(index, 1);
+      for (const property in this.baseData) {
+        if (property === answerUuid[0]) {
+          delete this.baseData[property];
         }
-      });
+      }
       const json = JSON.stringify(this.baseData);
 
       fs.writeFile(path, json, function (err) {

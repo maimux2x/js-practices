@@ -51,39 +51,16 @@ export class MemosApp {
   }
 
   read() {
-    (async () => {
-      const question = {
-        type: "select",
-        name: "result",
-        message: "参照したいメモを選択してください。",
-        choices: this.createChoices(this.setMemo),
-        result(names) {
-          return this.map(names);
-        },
-      };
-      const answer = await Enquirer.prompt(question);
-      const resultMemo = answer.result;
-      const memoValues = Object.values(resultMemo);
-      memoValues[0].forEach((element) => {
-        console.log(element);
+    this.chooseMemo("参照したいメモを選択してください。", (uuid) => {
+      const memo = this.baseData[uuid];
+      memo.forEach((row) => {
+        console.log(row);
       });
-    })();
+    });
   }
 
   delete() {
-    (async () => {
-      const question = {
-        type: "select",
-        name: "result",
-        message: "削除したいメモを選択してください",
-        choices: this.createChoices(this.setUuid),
-        result(names) {
-          return this.map(names);
-        },
-      };
-      const answer = await Enquirer.prompt(question);
-      const uuid = Object.values(answer.result)[0];
-
+    this.chooseMemo("削除したいメモを選択してください", (uuid) => {
       delete this.baseData[uuid];
 
       const json = JSON.stringify(this.baseData);
@@ -94,27 +71,31 @@ export class MemosApp {
         }
       });
       console.log("メモを削除しました。");
-    })();
+    });
   }
 
-  createChoices(callback) {
+  chooseMemo(message, callback) {
     const choices = [];
 
     for (const uuid in this.baseData) {
       const choice = {};
       choice.name = this.baseData[uuid][0];
-      choice.value = callback(uuid, this.baseData);
+      choice.value = uuid;
       choices.push(choice);
     }
 
-    return choices;
-  }
-
-  setMemo(uuid, baseData) {
-    return baseData[uuid];
-  }
-
-  setUuid(uuid) {
-    return uuid;
+    (async () => {
+      const question = {
+        type: "select",
+        name: "result",
+        message: message,
+        choices: choices,
+        result(names) {
+          return this.map(names);
+        },
+      };
+      const answer = await Enquirer.prompt(question);
+      callback(Object.values(answer.result)[0]);
+    })();
   }
 }

@@ -24,15 +24,15 @@ export class MemosApp {
   }
 
   add() {
-    const uuid = uuidv4();
     const input = fs.readFileSync("/dev/stdin", "utf-8");
     const memo = input.trim().split("\n");
-
+    
     if (memo[0] === "") {
       console.log("メモの1行目を入力してください。");
       return;
     }
-
+    
+    const uuid = uuidv4();
     this.baseData[uuid] = memo;
 
     const json = JSON.stringify(this.baseData);

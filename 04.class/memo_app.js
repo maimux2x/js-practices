@@ -25,13 +25,13 @@ export class MemosApp {
 
   add() {
     const input = fs.readFileSync("/dev/stdin", "utf-8");
-    const memo = input.trim().split("\n");
-    
-    if (memo[0] === "") {
+    const memo = input.trim();
+
+    if (memo === "") {
       console.log("メモの1行目を入力してください。");
       return;
     }
-    
+
     const uuid = uuidv4();
     this.baseData[uuid] = memo;
 
@@ -46,16 +46,14 @@ export class MemosApp {
 
   list() {
     for (const uuid in this.baseData) {
-      console.log(this.baseData[uuid][0]);
+      const row = this.baseData[uuid].split("\n");
+      console.log(row[0]);
     }
   }
 
   read() {
     this.chooseMemo("参照したいメモを選択してください。", (uuid) => {
-      const memo = this.baseData[uuid];
-      memo.forEach((row) => {
-        console.log(row);
-      });
+      console.log(this.baseData[uuid]);
     });
   }
 
@@ -78,8 +76,9 @@ export class MemosApp {
     const choices = [];
 
     for (const uuid in this.baseData) {
+      const row = this.baseData[uuid].split("\n");
       const choice = {};
-      choice.name = this.baseData[uuid][0];
+      choice.name = row[0];
       choice.value = uuid;
       choices.push(choice);
     }

@@ -46,8 +46,7 @@ export class MemosApp {
 
   list() {
     for (const uuid in this.baseData) {
-      const row = this.baseData[uuid].split("\n");
-      console.log(row[0]);
+      console.log(this.extractFirstLine(this.baseData[uuid]));
     }
   }
 
@@ -76,9 +75,8 @@ export class MemosApp {
     const choices = [];
 
     for (const uuid in this.baseData) {
-      const row = this.baseData[uuid].split("\n");
       const choice = {};
-      choice.name = row[0];
+      choice.name = this.extractFirstLine(this.baseData[uuid]);
       choice.value = uuid;
       choices.push(choice);
     }
@@ -96,5 +94,10 @@ export class MemosApp {
       const answer = await Enquirer.prompt(question);
       callback(Object.values(answer.result)[0]);
     })();
+  }
+
+  extractFirstLine(baseData) {
+    const lines = baseData.split("\n");
+    return lines[0];
   }
 }

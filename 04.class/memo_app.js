@@ -96,8 +96,7 @@ export class MemosApp {
     })();
   }
 
-  extractFirstLine(baseData) {
-    const lines = baseData.split("\n");
-    return lines[0];
+  extractFirstLine(lines) {
+    return lines.split("\n")[0];
   }
 }
